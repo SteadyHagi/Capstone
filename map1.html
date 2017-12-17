@@ -1,0 +1,273 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+  	    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+       #map {
+        height: 500px;
+        width: 100%;
+       }
+    </style>
+  </head>
+  <body>
+    <h3>Crime Predict Map</h3>
+    <div id="map"></div>
+    <script>
+
+  
+
+      function initMap() {
+
+      	var hello = [37.594785,126.975856,37.559784,126.995796,
+37.530997,126.980881,
+37.550872,127.040723,
+37.545722,127.085956,
+37.581258,127.053642,
+37.597357,127.092101,
+37.605301,127.01768,
+37.634207,127.014518,
+37.668673,127.034163,
+37.652695,127.074565,
+37.618884,126.926459,
+37.577525,126.938406,
+37.558582,126.908297,
+37.523479,126.855191,
+37.561281,126.823751,
+37.493565,126.855807,
+37.459984,126.900236,
+37.521323,126.90838,
+37.499815,126.951242,
+37.469247,126.946305,
+37.473826,127.031363,
+37.494921,127.063473,
+37.504448,127.115835,
+37.550043,127.146856,
+35.159879,129.044323,
+35.829024,128.559136,
+37.454656,126.703178,
+35.156412,126.836236,
+36.34156,127.389827,
+35.541299,129.264285,
+36.307826,127.3917,
+37.663811,126.835219,
+37.433336,127.001401,
+37.447504,126.864024,
+37.401922,127.298923,
+37.599283,127.13147,
+37.342195,126.922334,
+37.717384,126.606635,
+37.214191,126.813617,
+37.916525,127.076032,
+37.503305,126.787746,
+37.408411,127.120005,
+37.280965,127.006621,
+37.377037,126.7696,
+37.319583,126.829856,
+37.030838,127.296459,
+37.402573,126.930286,
+37.810138,127.005116,
+37.308072,127.617407,
+37.162403,127.049198,
+37.222107,127.214267,
+37.361873,126.98936,
+37.735939,127.066848,
+37.20712,127.486689,
+37.866642,126.789538,
+37.008511,126.976415,
+37.965625,127.233333,
+37.522511,127.207478,
+37.18555,126.856287,
+37.734345,128.877567,
+37.520853,129.105095,
+37.274486,129.158218,
+38.193901,128.572525,
+37.328561,127.9911,
+37.866425,127.7518,
+37.164139,128.978447,
+37.081537,128.147232,
+36.62584,127.490728,
+37.010168,127.905412,
+36.287683,127.236227,
+36.477857,127.077728,
+36.190806,127.150109,
+36.887337,126.669278,
+36.329052,126.592219,
+36.766964,126.453036,
+36.780875,127.007121,
+36.795531,127.172503,
+35.958813,126.720796,
+35.804232,126.87968,
+35.400666,127.381487,
+35.947996,126.957696,
+35.824645,127.115461,
+35.584551,126.861266,
+34.943002,127.689311,
+35.009262,126.711509,
+34.80278,126.388268,
+34.947237,127.507474,
+34.759986,127.662121,
+35.822605,128.805709,
+35.83756,129.218029,
+36.105072,128.365757,
+36.125075,128.128368,
+36.598584,128.196651,
+36.417657,128.151363,
+36.562287,128.733795,
+36.819814,128.608187,
+35.968187,128.934161,
+36.009005,129.355521,
+34.881198,128.623441,
+35.233785,128.877988,
+35.210613,128.580424,
+35.495204,128.747628,
+34.997609,128.061184,
+35.330935,129.021971,
+35.177475,128.087103,
+35.175271,128.60944,
+34.845902,128.419951,
+33.250271,126.563122,
+33.487511,126.489142];
+
+
+  var ws = new WebSocket("ws://192.168.0.18:3001");
+
+  // 연결이 수립되면 서버에 메시지를 전송한다
+  ws.onopen = function(event) {
+   //ws.send("START");
+  }
+
+  // 서버로 부터 메시지를 수신한다
+  ws.onmessage = function(event) {
+    console.log("Server message: ", event.data);
+  }
+
+  // error event handler
+  ws.onerror = function(event) {
+    console.log("Server error message: ", event.data);
+  }
+
+  		var ohwonchoon = {lat: 37.277311, lng: 127.024780}
+        var uluru = {lat: 37.281954, lng: 127.043524}
+
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 13,
+          center: uluru
+        });
+  /*      var marker = new google.maps.Marker({
+          position: uluru,
+          map: map,
+         // icon: "./img/help2.png"
+        });
+         var marker2 = new google.maps.Marker({
+          position: ohwonchoon,
+          map: map,
+         // icon: "./img/help2.png"
+        });
+*/
+var contentString ='';
+
+          var infowindow = new google.maps.InfoWindow({
+          content: contentString
+        });
+
+      //    marker.addListener('click', function() {
+       //   infowindow.open(map, marker);
+       // });
+
+            google.maps.event.addListener(map, 'click', function(event) {
+		   	addMarker(event.latLng, map);
+/*
+				var result = Math.floor(Math.random() * 200) + 1;
+		   	 	var x_label = hello[result];
+		   	 	var y_label = hello[result+1];
+		   	    ws.send(""+x_label+" "+y_label);
+		   	    console.log("Send Succes");
+
+		   	      ws.onmessage = function(event) {
+				    alert("ALERT: " + event.data);
+				    var test = event.data;
+				
+				  } */
+  			});
+
+var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+var labelIndex = 0;
+var test_lable = "Warning"
+// label: labels[labelIndex++ % labels.length],
+ function addMarker(location, map) {
+  // Add the marker at the clicked location, and add the next-available label
+  // from the array of alphabetical characters.
+		  var marker = new google.maps.Marker({
+		    position: location,
+		    label: labels[test_lable],
+		    map: map
+		  });
+
+		    var cityCircle = new google.maps.Circle({
+            strokeColor: '#FF0000',
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: '#FF0000',
+            fillOpacity: 0.35,
+            map: map,
+            center: location,
+            radius: 700
+          });
+        
+
+ var a; 
+		  		var result = Math.floor(Math.random() * 200) + 1;
+		   	 	var x_label = hello[result];
+		   	 	var y_label = hello[result+1];
+		   	    ws.send(""+x_label+" "+y_label);
+		   	    console.log("Send Succes");
+
+		   	      ws.onmessage = function(event) {
+				    console.log("ALERT: " + event.data);
+				    var test = event.data;
+				   console.log("test : " + typeof(test));
+				    if (test == 1) a = '매우 위험, 연간 발생률 20000건 이상';
+				    else if (test == 2) a = '약간 위험, 연간 발생률 5000건 이상';
+				    else if (test ==3) a = '보통, 연간 발생률 1000건 이상';
+				    else a = '안전, 연간 발생률 1000건 미만 ';
+				    console.log(a);
+  	var contents = "<b>좌표 : </b>" + location +'\n' + '<p><b>Crime Predict :</b>  </p>' + a ;
+		   	 makeInfoWindowEvent(map, infowindow, contents, marker); 
+}
+				  }
+
+		 
+
+  function makeInfoWindowEvent(map, infowindow, contentString, marker) {
+    google.maps.event.addListener(marker, 'click', function() {
+      infowindow.setContent(contentString);
+      infowindow.open(map, marker);
+    });
+  }
+
+
+/*
+    var cityCircle = new google.maps.Circle({
+            strokeColor: '#FF0000',
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: '#FF0000',
+            fillOpacity: 0.35,
+            map: map,
+            center: citymap[city].center,
+            radius: Math.sqrt(citymap[city].population) * 100
+          });
+        }
+ */
+
+
+}//initMap
+   
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAIrjCYQQdvwm9Z4HlAqcsVzAZA1DJPR4o&callback=initMap">
+    </script>
+  </body>
+</html>
